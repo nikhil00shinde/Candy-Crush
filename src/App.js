@@ -5,10 +5,12 @@ const candyColors = ["blue", "green", "orange", "purple", "red", "yellow"];
 
 const App = () => {
 	const [currColorArrangement, setCurrentColorArrangement] = useState([]);
+	const [squareBeingDragged, setSquareBeingDragged] = useState(null);
+	const [squareBeingReplaced, setSquareBeingReplaced] = useState(null);
 
 	// check for column of 3 and 4
 	const checkForColumnOfFour = () => {
-		for (let i = 0; i < 39; i++) {
+		for (let i = 0; i <= 39; i++) {
 			const columnOfFour = [i, i + width, i + width * 2, i + width * 3];
 			const decidedColor = currColorArrangement[i];
 
@@ -18,12 +20,13 @@ const App = () => {
 				)
 			) {
 				columnOfFour.forEach((square) => (currColorArrangement[square] = ""));
+				return true;
 			}
 		}
 	};
 
 	const checkForColumnOfThree = () => {
-		for (let i = 0; i < 47; i++) {
+		for (let i = 0; i <= 47; i++) {
 			const columnOfThree = [i, i + width, i + width * 2];
 			const decidedColor = currColorArrangement[i];
 
@@ -33,6 +36,7 @@ const App = () => {
 				)
 			) {
 				columnOfThree.forEach((square) => (currColorArrangement[square] = ""));
+				return true;
 			}
 		}
 	};
@@ -53,6 +57,7 @@ const App = () => {
 				)
 			) {
 				rowOfThree.forEach((square) => (currColorArrangement[square] = ""));
+				return true;
 			}
 		}
 	};
@@ -74,12 +79,13 @@ const App = () => {
 				)
 			) {
 				rowOfFour.forEach((square) => (currColorArrangement[square] = ""));
+				return true;
 			}
 		}
 	};
 
 	const moveIntoSquareBelow = () => {
-		for (let i = 0; i < 64 - width; i++) {
+		for (let i = 0; i <= 55; i++) {
 			const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
 
 			const isFirstRow = firstRow.includes(i);
@@ -93,6 +99,64 @@ const App = () => {
 				currColorArrangement[i + width] = currColorArrangement[i];
 				currColorArrangement[i] = "";
 			}
+		}
+	};
+
+	const dragStart = (e) => {
+		// console.log(e.target);
+		console.log("drag start");
+		setSquareBeingDragged(e.target);
+	};
+	const dragDrop = (e) => {
+		// console.log(e.target);
+		console.log("drag drop");
+		setSquareBeingReplaced(e.target);
+	};
+	const dragEnd = (e) => {
+		console.log("drag end");
+
+		const squareBeingReplacedId = parseInt(
+			squareBeingReplaced.getAttribute("data-id")
+		);
+		const squareBeingDraggedId = parseInt(
+			squareBeingDragged.getAttribute("data-id")
+		);
+
+		currColorArrangement[squareBeingReplacedId] =
+			squareBeingDragged.style.backgroundColor;
+		currColorArrangement[squareBeingDraggedId] =
+			squareBeingReplaced.style.backgroundColor;
+
+		const validMoves = [
+			squareBeingDraggedId - 1,
+			squareBeingDraggedId - width,
+			squareBeingDraggedId + 1,
+			squareBeingDraggedId + width,
+		];
+
+		const validMove = validMoves.includes(squareBeingReplacedId);
+
+
+		const isAColumnOfFour = checkForColumnOfFour();
+		const isAColumnOfThree = checkForColumnOfThree();
+		const isARowOfFour = checkForRowOfFour();
+		const isARowOfThree = checkForRowOfThree();
+
+		if (
+			squareBeingReplacedId &&
+			validMove &&
+			(isAColumnOfThree || isAColumnOfFour || isARowOfFour || isARowOfThree)
+		) {
+			setSquareBeingDragged(null);
+			setSquareBeingReplaced(null);
+			console.log(1);
+		} else {
+			currColorArrangement[squareBeingReplacedId] =
+				squareBeingReplaced.style.backgroundColor;
+			currColorArrangement[squareBeingDraggedId] =
+				squareBeingDragged.style.backgroundColor;
+			setCurrentColorArrangement([...currColorArrangement]);
+			console.log(2);
 		}
 	};
 
@@ -135,6 +199,14 @@ const App = () => {
 							key={index}
 							style={{ backgroundColor: candyColor }}
 							alt={candyColor}
+							data-id={index}
+							draggable="true"
+							onDragStart={dragStart}
+							onDragOver={(e) => e.preventDefault()}
+							onDragEnter={(e) => e.preventDefault()}
+							onDragLeave={(e) => e.preventDefault()}
+							onDrop={dragDrop}
+							onDragEnd={dragEnd}
 						/>
 					);
 				})}
