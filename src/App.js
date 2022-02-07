@@ -140,6 +140,7 @@ const App = () => {
 
 	const dragStart = (e) => {
 		setSquareBeingDragged(e.target);
+
 	};
 	const dragDrop = (e) => {
 		setSquareBeingReplaced(e.target);
@@ -185,6 +186,7 @@ const App = () => {
 				squareBeingDragged.getAttribute("src");
 			setCurrentColorArrangement([...currColorArrangement]);
 		}
+		e.preventDefault();
 	};
 
 	// random color array
@@ -220,7 +222,6 @@ const App = () => {
 	return (
 		<>
 			<div className="app">
-			
 				<div className="game">
 					{currColorArrangement.map((candyColor, index) => {
 						return (
