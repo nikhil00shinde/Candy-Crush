@@ -140,10 +140,10 @@ const App = () => {
 
 	const dragStart = (e) => {
 		setSquareBeingDragged(e.target);
-
 	};
 	const dragDrop = (e) => {
 		setSquareBeingReplaced(e.target);
+		e.preventDefault();
 	};
 	const dragEnd = (e) => {
 		const squareBeingReplacedId = parseInt(
